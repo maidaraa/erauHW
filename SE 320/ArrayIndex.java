@@ -1,7 +1,7 @@
 // Mai Evans 9/25/2023
 import java.util.Random;
 import java.util.Scanner;
-import java.util.ArrayIndexOutOfBoundsException;
+import java.lang.ArrayIndexOutOfBoundsException;
 
 public class ArrayIndex {
     
