@@ -11,7 +11,5 @@ This program shall execute the binary search algorithm on a key and sorted array
 
 searchAlg() method cited from page 25 of "Algorithms, Fourth Edition" by Robert Sedgewick and Kevin Wayne
 
-## Known Bugs
 
-N/A
 
