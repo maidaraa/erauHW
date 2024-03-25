@@ -1,4 +1,4 @@
-## PA4 BST and Heap
+## PA2 BST and Heap
 
 Author: Mai Evans
 
@@ -12,6 +12,3 @@ This program shall parse through the input from an input file and insert it into
 BST.java cited from GitHub by Robert Sedgewick and Kevin Wayne
 MaxHeap.java cited from GitHub by Professor Stansbury
 
-## Known Bugs
-
-N/A
