@@ -1,1 +1,243 @@
+import java.sql.*;
+import java.util.*;
 
+public class MariaDB {
+
+    private static Scanner scan = new Scanner(System.in);
+    public static void main(String[] args) {
+        MariaDB mdb = new MariaDB();
+        
+        String jdbcUrl = "jdbc:mariadb://localhost:3306/legos";
+        String username = "root";
+        String password = "password";
+        
+        // Try-with-resources to automatically close the connection
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, username, password)) {
+            System.out.println("Connected to MariaDB!");
+        
+           mdb.mainMenu(connection);
+
+        } catch (SQLException e) {
+            System.err.println("Error connecting to MariaDB: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void mainMenu(Connection connection) throws SQLException{
+        
+        Statement statement = connection.createStatement();
+        System.out.println("\nSelect an action from the menu below: Usage: 1-10");
+
+        System.out.println("\t1. Print all Lego set info\n"+"\t2. Print all Lego keychain info\n" +"\t3. Print all themes info\n" + "\t4. Search for Lego sets\n"+"\t5. Search for Lego keychains\n"
+        + "\t6. Search for themes by name\n" +"\t7. Add Lego set\n" +"\t8. Remove Lego set\n" +"\t9. Add Lego keychain\n" +"\t10. Remove Lego keychain\n");
+        System.out.print(">> ");
+        int choice = scan.nextInt();
+
+        switch(choice) {
+            case 1:
+              System.out.println("Selected: 1. Print all Lego set info\n");
+              printLegoSets(connection, statement);
+              break;
+            case 2:
+              System.out.println("Selected: 2. Print all Lego keychain info\n");
+              printLegoKeychains(connection, statement);
+              break;
+            case 3:
+              System.out.println("Selected: 3. Print all themes info\n");
+              printThemes(connection, statement);
+              break;
+            case 4:
+              System.out.println("Selected: 4. Search Lego sets\n");
+              searchLegoSets(connection, statement);
+              break;  
+            case 5:
+              System.out.println("Selected: 5. Search Lego keychains\n");
+              searchLegoKeychains(connection, statement);
+              break;
+            case 6:
+              System.out.println("Selected: 6. Search for themes by name\n");
+              searchThemes(connection, statement);
+              break;
+            case 7:
+              System.out.println("Selected: 7. Add Lego set\n");
+              addLegoSets(connection, statement);
+              break;  
+            case 8:
+              System.out.println("Selected: 8. Remove Lego set\n");
+              removeLegoSets(connection, statement);
+              break;
+            case 9:
+              System.out.println("Selected: 9. Add Lego keychain\n");
+              addLegoKeychains(connection, statement);
+              break;  
+            case 10:
+              System.out.println("Selected: 10. Remove Lego keychain\n");
+              removeLegoKeychains(connection, statement);
+              break;
+            default:
+          }
+
+    }
+
+    private void reMenu(Connection connection){
+        
+        System.out.print("\nEnter 1 to return to menu, anything else to quit\n" + ">> ");
+        try{
+            int input = scan.nextInt();
+              if(input == 1){
+                mainMenu(connection);
+              }else{
+                System.out.print("Bye~Bye!");
+                System.exit(0);
+              }
+          }catch (Exception e){
+            System.out.print("Bye~Bye!");
+          }
+        
+    }
+    private void printLegoSets(Connection connection, Statement statement) throws SQLException{
+
+        String query = "SELECT * FROM LegoSets";
+        ResultSet resultSet = statement.executeQuery(query);
+        System.out.println("#      Name                                Theme                     Year  Age  Pieces  Retired");
+        
+        // Process the query results
+        while (resultSet.next()) {
+            // Retrieve data from each row
+            int itemNum = resultSet.getInt("itemNumber");
+            String name = resultSet.getString("name"); 
+            String theme = resultSet.getString("theme"); 
+            int year = resultSet.getInt("year");
+            String ageRange = resultSet.getString("ageRange"); 
+            int piecesNum = resultSet.getInt("piecesNum");
+            boolean retired = resultSet.getBoolean("retired");
+    
+            System.out.println("----------------------------------------------------------------------------------------------------");
+            System.out.printf("%-6d %-35s %-25s %-5d %-4s %-7d %-7b\n", itemNum, name, theme, year, ageRange, piecesNum, retired);
+
+        }
+        System.out.println("----------------------------------------------------------------------------------------------------");
+        reMenu(connection);
+
+    }
+
+    private void printLegoKeychains(Connection connection, Statement statement) throws SQLException{
+        String query = "SELECT * FROM LegoKeychains";
+        ResultSet resultSet = statement.executeQuery(query);
+        System.out.println("#       Name                         Theme         Year");
+
+        // Process the query results
+        while (resultSet.next()) {
+            // Retrieve data from each row
+            int itemNum = resultSet.getInt("itemNumber");
+            String name = resultSet.getString("name"); 
+            String theme = resultSet.getString("theme"); 
+            int year = resultSet.getInt("year");
+
+            System.out.println("---------------------------------------------------------");
+            System.out.printf("%-7d %-28s %-13s %d\n", itemNum, name, theme, year);
+        }
+        System.out.println("---------------------------------------------------------");
+        reMenu(connection);
+    }
+
+    private void printThemes(Connection connection, Statement statement) throws SQLException{
+        String query = "SELECT * FROM Themes";
+        ResultSet resultSet = statement.executeQuery(query);
+        System.out.println("Name                     Films   VideoGames");
+
+            while (resultSet.next()) {
+                // Retrieve data from each row
+                String name = resultSet.getString("name"); 
+                Boolean films = resultSet.getBoolean("films"); 
+                Boolean videoGames = resultSet.getBoolean("videoGames");
+
+                System.out.println("-------------------------------------------");
+                System.out.printf("%-24s %-7b %-11b\n", name, films, videoGames);
+            }
+            System.out.println("-------------------------------------------");
+            reMenu(connection);
+    }
+
+    private void searchLegoSets(Connection connection, Statement statement) throws SQLException{
+
+    }
+
+    private void searchLegoKeychains(Connection connection, Statement statement) throws SQLException{
+        
+    }
+
+    private void searchThemes(Connection connection, Statement statement) throws SQLException{
+        
+    }
+
+    private void addLegoSets(Connection connection, Statement statement) throws SQLException{
+
+        try {
+            // Prompt the user for input
+            System.out.println("Enter the item number of the LEGO set:");
+            int itemNum = scan.nextInt(); // Read the item number
+            scan.nextLine(); // Consume the newline character
+            
+            System.out.println("Enter the name of the LEGO set:");
+            String name = scan.nextLine(); // Read the name
+            
+            System.out.println("Enter the theme of the LEGO set:");
+            String theme = scan.nextLine(); // Read the theme
+            
+            System.out.println("Enter the year of the LEGO set:");
+            int year = scan.nextInt(); // Read the year
+            scan.nextLine(); // Consume the newline character
+            
+            System.out.println("Enter the age range of the LEGO set:");
+            String ageRange = scan.nextLine(); // Read the age range
+            
+            System.out.println("Enter the number of pieces in the LEGO set:");
+            int piecesNum = scan.nextInt(); // Read the number of pieces
+            
+            System.out.println("Is the LEGO set retired? (true/false):");
+            boolean retired = scan.nextBoolean(); // Read the retired status
+            scan.nextLine(); // Consume the newline character
+    
+            // Prepare the SQL statement
+            String sql = "INSERT INTO LegoSets (itemNumber, name, theme, year, ageRange, piecesNum, retired) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+    
+            // Set the parameters
+            preparedStatement.setInt(1, itemNum);
+            preparedStatement.setString(2, name);
+            preparedStatement.setString(3, theme);
+            preparedStatement.setInt(4, year);
+            preparedStatement.setString(5, ageRange);
+            preparedStatement.setInt(6, piecesNum);
+            preparedStatement.setBoolean(7, retired);
+    
+            // Execute the update
+            int rowsAffected = preparedStatement.executeUpdate();
+    
+            if (rowsAffected > 0) {
+                System.out.println("LEGO set added successfully.");
+            } else {
+                System.out.println("Failed to add LEGO set.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error adding LEGO set: " + e.getMessage());
+            e.printStackTrace();
+        }
+        reMenu(connection);
+        
+    }
+
+    private void removeLegoSets(Connection connection, Statement statement) throws SQLException{
+        
+    }
+
+    private void addLegoKeychains(Connection connection, Statement statement) throws SQLException{
+        
+    }
+
+    private void removeLegoKeychains(Connection connection, Statement statement) throws SQLException{
+        
+    }
+
+}
