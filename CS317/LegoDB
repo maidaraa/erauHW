@@ -1,7 +1,8 @@
 import java.sql.*;
 import java.util.*;
 
-public class MariaDB {
+public class MariaDB
+ {
 
     private static Scanner scan = new Scanner(System.in);
     public static void main(String[] args) {
@@ -26,10 +27,10 @@ public class MariaDB {
     private void mainMenu(Connection connection) throws SQLException{
         
         Statement statement = connection.createStatement();
-        System.out.println("\nSelect an action from the menu below: Usage: 1-10");
+        System.out.println("\nSelect an action from the menu below: Usage: 1-11");
 
         System.out.println("\t1. Print all Lego set info\n"+"\t2. Print all Lego keychain info\n" +"\t3. Print all themes info\n" + "\t4. Search for Lego sets\n"+"\t5. Search for Lego keychains\n"
-        + "\t6. Search for themes by name\n" +"\t7. Add Lego set\n" +"\t8. Remove Lego set\n" +"\t9. Add Lego keychain\n" +"\t10. Remove Lego keychain\n");
+        + "\t6. Search for themes by name\n" +"\t7. Add Lego set\n" +"\t8. Remove Lego set\n" +"\t9. Add Lego keychain\n" +"\t10. Remove Lego keychain\n"+"\t11. Quit\n");
         System.out.print(">> ");
         int choice = scan.nextInt();
 
@@ -74,25 +75,21 @@ public class MariaDB {
               System.out.println("Selected: 10. Remove Lego keychain\n");
               removeLegoKeychains(connection, statement);
               break;
+            case 11:
+              System.out.print("Bye~Bye!");
+              System.exit(0);
             default:
           }
 
     }
 
-    private void reMenu(Connection connection){
-        
-        System.out.print("\nEnter 1 to return to menu, anything else to quit\n" + ">> ");
-        try{
-            int input = scan.nextInt();
-              if(input == 1){
-                mainMenu(connection);
-              }else{
-                System.out.print("Bye~Bye!");
-                System.exit(0);
-              }
-          }catch (Exception e){
-            System.out.print("Bye~Bye!");
-          }
+    private void pause(){
+
+        try {
+            Thread.sleep(500); // Pauses execution for 0.5 seconds 
+        } catch (InterruptedException e) {
+            System.out.print("crashed");
+        }
         
     }
     private void printLegoSets(Connection connection, Statement statement) throws SQLException{
@@ -117,7 +114,8 @@ public class MariaDB {
 
         }
         System.out.println("----------------------------------------------------------------------------------------------------");
-        reMenu(connection);
+        pause();
+        mainMenu(connection);
 
     }
 
@@ -138,7 +136,8 @@ public class MariaDB {
             System.out.printf("%-7d %-28s %-13s %d\n", itemNum, name, theme, year);
         }
         System.out.println("---------------------------------------------------------");
-        reMenu(connection);
+        pause();
+        mainMenu(connection);
     }
 
     private void printThemes(Connection connection, Statement statement) throws SQLException{
@@ -156,7 +155,8 @@ public class MariaDB {
                 System.out.printf("%-24s %-7b %-11b\n", name, films, videoGames);
             }
             System.out.println("-------------------------------------------");
-            reMenu(connection);
+            pause();
+            mainMenu(connection);
     }
 
     private void searchLegoSets(Connection connection, Statement statement) throws SQLException{
@@ -224,20 +224,119 @@ public class MariaDB {
             System.err.println("Error adding LEGO set: " + e.getMessage());
             e.printStackTrace();
         }
-        reMenu(connection);
+        pause();
+        mainMenu(connection);
         
     }
 
     private void removeLegoSets(Connection connection, Statement statement) throws SQLException{
+
+        try {
+            // Prompt the user for input
+            System.out.println("Enter the item number of the LEGO set:");
+            int itemNum = scan.nextInt(); // Read the item number
+           
+            
+            // Prepare the SQL statement
+            String sql = "DELETE FROM LegoSets WHERE itemNumber = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+    
+            // Set the parameters
+            preparedStatement.setInt(1, itemNum);
+            
+    
+            // Execute the update
+            int rowsAffected = preparedStatement.executeUpdate();
+    
+            if (rowsAffected > 0) {
+                System.out.println("LEGO set removed successfully.");
+            } else {
+                System.out.println("Failed to remove LEGO set.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error removing LEGO set: " + e.getMessage());
+            e.printStackTrace();
+        }
+        pause();
+        mainMenu(connection);
         
     }
 
     private void addLegoKeychains(Connection connection, Statement statement) throws SQLException{
+
+        try {
+            // Prompt the user for input
+            System.out.println("Enter the item number of the LEGO keychain:");
+            int itemNum = scan.nextInt(); // Read the item number
+            scan.nextLine(); // Consume the newline character
+            
+            System.out.println("Enter the name of the LEGO keychain:");
+            String name = scan.nextLine(); // Read the name
+            
+            System.out.println("Enter the theme of the LEGO keychain:");
+            String theme = scan.nextLine(); // Read the theme
+            
+            System.out.println("Enter the year of the LEGO keychain:");
+            int year = scan.nextInt(); // Read the year
+            scan.nextLine(); // Consume the newline character
+    
+            // Prepare the SQL statement
+            String sql = "INSERT INTO LegoKeychains (itemNumber, name, theme, year) VALUES (?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+    
+            // Set the parameters
+            preparedStatement.setInt(1, itemNum);
+            preparedStatement.setString(2, name);
+            preparedStatement.setString(3, theme);
+            preparedStatement.setInt(4, year);
+    
+            // Execute the update
+            int rowsAffected = preparedStatement.executeUpdate();
+    
+            if (rowsAffected > 0) {
+                System.out.println("LEGO keychain added successfully.");
+            } else {
+                System.out.println("Failed to add LEGO keychain.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error adding LEGO set: " + e.getMessage());
+            e.printStackTrace();
+        }
+        pause();
+        mainMenu(connection);
         
     }
 
     private void removeLegoKeychains(Connection connection, Statement statement) throws SQLException{
-        
+
+        try {
+            // Prompt the user for input
+            System.out.println("Enter the item number of the LEGO keychain:");
+            int itemNum = scan.nextInt(); // Read the item number
+           
+            
+            // Prepare the SQL statement
+            String sql = "DELETE FROM LegoKeychains WHERE itemNumber = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+    
+            // Set the parameters
+            preparedStatement.setInt(1, itemNum);
+            
+    
+            // Execute the update
+            int rowsAffected = preparedStatement.executeUpdate();
+    
+            if (rowsAffected > 0) {
+                System.out.println("LEGO keychain removed successfully.");
+            } else {
+                System.out.println("Failed to remove LEGO keychain.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error removing LEGO keychain: " + e.getMessage());
+            e.printStackTrace();
+        }
+        pause();
+        mainMenu(connection);        
     }
 
 }
