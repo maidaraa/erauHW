@@ -1,12 +1,21 @@
+/*
+ * Author: Mai Evans
+ * Project: LegoDB (Lego Database)
+ * 
+ * Internal Java Librairies: .sql.* and .util.* as well as the JDBC to interact with MariaDB
+ * Modified: 4/25/2024
+ */
+
+
 import java.sql.*;
 import java.util.*;
 
-public class MariaDB
+public class LegoDB
  {
 
     private static Scanner scan = new Scanner(System.in);
     public static void main(String[] args) {
-        MariaDB mdb = new MariaDB();
+        LegoDB mdb = new LegoDB();
         
         String jdbcUrl = "jdbc:mariadb://localhost:3306/legos";
         String username = "root";
@@ -92,6 +101,7 @@ public class MariaDB
         }
         
     }
+    // option 1
     private void printLegoSets(Connection connection, Statement statement) throws SQLException{
 
         String query = "SELECT * FROM LegoSets";
@@ -118,7 +128,7 @@ public class MariaDB
         mainMenu(connection);
 
     }
-
+    // option 2
     private void printLegoKeychains(Connection connection, Statement statement) throws SQLException{
         String query = "SELECT * FROM LegoKeychains";
         ResultSet resultSet = statement.executeQuery(query);
@@ -139,7 +149,7 @@ public class MariaDB
         pause();
         mainMenu(connection);
     }
-
+    // option 3
     private void printThemes(Connection connection, Statement statement) throws SQLException{
         String query = "SELECT * FROM Themes";
         ResultSet resultSet = statement.executeQuery(query);
@@ -158,19 +168,215 @@ public class MariaDB
             pause();
             mainMenu(connection);
     }
+//  4
+private void searchLegoSets(Connection connection, Statement statement) throws SQLException {
+    PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
+    String query = null;
+    
+    System.out.println("Choose an attribute to search by:\n" + "\t1. Item Number\n" + "\t2. Name\n" + "\t3. Theme\n" + "\t4. Year\n");
+    System.out.print(">> ");
+    int choice = scan.nextInt();
 
-    private void searchLegoSets(Connection connection, Statement statement) throws SQLException{
+    switch (choice) {
+        case 1:
+            System.out.println("Selected: 1. Item Number\n");
+            System.out.print("Enter the item number of the LEGO set: ");
+            int itemNum = scan.nextInt(); // Read the item number
+            // Prepare the query with a placeholder for the item number
+            query = "SELECT * FROM LegoSets WHERE itemNumber = ?";
+            // Create a prepared statement
+            preparedStatement = connection.prepareStatement(query);
+            // Set the parameter value
+            preparedStatement.setInt(1, itemNum);
+            break;
+        case 2:
+            System.out.println("Selected: 2. Name\n");
+            System.out.print("Enter the name of the LEGO set:");
+            scan.nextLine(); // Consume the newline character
 
+            String name = scan.nextLine(); // Read the name
+            query = "SELECT * FROM LegoSets WHERE name LIKE ?";
+            // Create a prepared statement
+            preparedStatement = connection.prepareStatement(query);
+            // Set the parameter value
+            preparedStatement.setString(1, "%" + name + "%");
+            break;
+        case 3:
+            System.out.println("Selected: 3. Theme\n");
+            System.out.print("Enter the theme of the LEGO set:");
+            scan.nextLine(); // Consume the newline character
+
+            String theme = scan.nextLine(); // Read the theme
+            query = "SELECT * FROM LegoSets WHERE theme LIKE ?";
+            // Create a prepared statement
+            preparedStatement = connection.prepareStatement(query);
+            // Set the parameter value
+            preparedStatement.setString(1, "%" + theme + "%");
+            break;
+        case 4:
+            System.out.println("Selected: 4. Year\n");
+            System.out.print("Enter the year of the LEGO set:");
+            int year = scan.nextInt(); // Read the year
+            // Prepare the query with a placeholder for the year
+            query = "SELECT * FROM LegoSets WHERE year = ?";
+            // Create a prepared statement
+            preparedStatement = connection.prepareStatement(query);
+            // Set the parameter value
+            preparedStatement.setInt(1, year);
+            break;
+        default:
+            // Handle invalid choice
+            break;
     }
 
+    // Execute the query if preparedStatement is not null
+    if (preparedStatement != null) {
+        // Execute the query
+        resultSet = preparedStatement.executeQuery();
+        // Process the results
+        System.out.println("#      Name                                Theme                     Year  Age  Pieces  Retired");
+        while (resultSet.next()) {
+            // Access each column in the current row
+            int itemNumber = resultSet.getInt("itemNumber");
+            String name = resultSet.getString("name");
+            String theme = resultSet.getString("theme");
+            int resultYear = resultSet.getInt("year");
+            String ageRange = resultSet.getString("ageRange");
+            int piecesNum = resultSet.getInt("piecesNum");
+            boolean retired = resultSet.getBoolean("retired");
+            // Print results
+            System.out.println("----------------------------------------------------------------------------------------------------");
+            System.out.printf("%-6d %-35s %-25s %-5d %-4s %-7d %-7b\n", itemNumber, name, theme, resultYear, ageRange, piecesNum, retired);
+        }
+        System.out.println("----------------------------------------------------------------------------------------------------");
+    }
+
+    pause();
+    mainMenu(connection);
+}
+
+// option 5
     private void searchLegoKeychains(Connection connection, Statement statement) throws SQLException{
         
-    }
-
-    private void searchThemes(Connection connection, Statement statement) throws SQLException{
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        String query = null;
         
-    }
+        System.out.println("Choose an attribute to search by:\n" + "\t1. Item Number\n" + "\t2. Name\n" + "\t3. Theme\n" + "\t4. Year\n");
+        System.out.print(">> ");
+        int choice = scan.nextInt();
 
+        switch (choice) {
+            case 1:
+                System.out.println("Selected: 1. Item Number\n");
+                System.out.print("Enter the item number of the LEGO keychain: ");
+                int itemNum = scan.nextInt(); // Read the item number
+                // Prepare the query with a placeholder for the item number
+                query = "SELECT * FROM LegoKeychains WHERE itemNumber = ?";
+                // Create a prepared statement
+                preparedStatement = connection.prepareStatement(query);
+                // Set the parameter value
+                preparedStatement.setInt(1, itemNum);
+                break;
+            case 2:
+                System.out.println("Selected: 2. Name\n");
+                System.out.print("Enter the name of the LEGO keychain:");
+                scan.nextLine(); // Consume the newline character
+    
+                String name = scan.nextLine(); // Read the name
+                query = "SELECT * FROM LegoKeychains WHERE name LIKE ?";
+                // Create a prepared statement
+                preparedStatement = connection.prepareStatement(query);
+                // Set the parameter value
+                preparedStatement.setString(1, "%" + name + "%");
+                break;
+            case 3:
+                System.out.println("Selected: 3. Theme\n");
+                System.out.print("Enter the theme of the LEGO keychain:");
+                scan.nextLine(); // Consume the newline character
+    
+                String theme = scan.nextLine(); // Read the theme
+                query = "SELECT * FROM LegoKeychains WHERE theme LIKE ?";
+                // Create a prepared statement
+                preparedStatement = connection.prepareStatement(query);
+                // Set the parameter value
+                preparedStatement.setString(1, "%" + theme + "%");
+                break;
+            case 4:
+                System.out.println("Selected: 4. Year\n");
+                System.out.print("Enter the year of the LEGO keychain:");
+                int year = scan.nextInt(); // Read the year
+                // Prepare the query with a placeholder for the year
+                query = "SELECT * FROM LegoKeychains WHERE year = ?";
+                // Create a prepared statement
+                preparedStatement = connection.prepareStatement(query);
+                // Set the parameter value
+                preparedStatement.setInt(1, year);
+                break;
+            default:
+                // Handle invalid choice
+                break;
+        }
+    
+        // Execute the query if preparedStatement is not null
+        if (preparedStatement != null) {
+            // Execute the query
+            resultSet = preparedStatement.executeQuery();
+            // Process the results
+            System.out.println("#       Name                         Theme         Year");
+            while (resultSet.next()) {
+                // Access each column in the current row
+                int itemNumber = resultSet.getInt("itemNumber");
+                String name = resultSet.getString("name");
+                String theme = resultSet.getString("theme");
+                int year = resultSet.getInt("year");
+                // Print results
+                System.out.println("---------------------------------------------------------");
+            System.out.printf("%-7d %-28s %-13s %d\n", itemNumber, name, theme, year);
+            }
+        System.out.println("---------------------------------------------------------");
+        }
+    
+        pause();
+        mainMenu(connection);
+    }
+// option 6
+private void searchThemes(Connection connection, Statement statement) throws SQLException {
+    System.out.print("Please enter name: ");
+    System.out.print("Please enter name: ");
+    scan.nextLine(); // Consume the newline character
+    String themeName = scan.nextLine(); // Read the theme name and trim any leading/trailing whitespace
+
+    String query = "SELECT * FROM Themes WHERE name LIKE ?";
+    // Create a prepared statement
+    PreparedStatement preparedStatement = connection.prepareStatement(query);
+    // Set the parameter value
+    preparedStatement.setString(1, "%" + themeName + "%");
+
+    // Execute the prepared statement
+    ResultSet resultSet = preparedStatement.executeQuery();
+    
+    System.out.println("Name                     Films   VideoGames");
+
+        while (resultSet.next()) {
+            // Retrieve data from each row
+            String name = resultSet.getString("name"); 
+            Boolean films = resultSet.getBoolean("films"); 
+            Boolean videoGames = resultSet.getBoolean("videoGames");
+
+            System.out.println("-------------------------------------------");
+            System.out.printf("%-24s %-7b %-11b\n", name, films, videoGames);
+        }
+    System.out.println("-------------------------------------------");
+
+    pause();
+    mainMenu(connection);
+}
+
+
+
+// option 7
     private void addLegoSets(Connection connection, Statement statement) throws SQLException{
 
         try {
@@ -228,7 +434,7 @@ public class MariaDB
         mainMenu(connection);
         
     }
-
+// option 8
     private void removeLegoSets(Connection connection, Statement statement) throws SQLException{
 
         try {
@@ -261,7 +467,7 @@ public class MariaDB
         mainMenu(connection);
         
     }
-
+// option 9
     private void addLegoKeychains(Connection connection, Statement statement) throws SQLException{
 
         try {
@@ -306,7 +512,7 @@ public class MariaDB
         mainMenu(connection);
         
     }
-
+// option 10
     private void removeLegoKeychains(Connection connection, Statement statement) throws SQLException{
 
         try {
